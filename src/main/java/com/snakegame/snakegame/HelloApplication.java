@@ -42,7 +42,7 @@ public class HelloApplication extends Application {
 
     public void start(Stage stage) throws IOException {
 
-        canvas = new Canvas(300, 300);
+        canvas = new Canvas(600, 600);
         Rectangle background = new Rectangle(0, 0, canvas.getHeight(), canvas.getWidth());
         background.setFill(Paint.valueOf("BLACK"));
 
@@ -73,7 +73,7 @@ public class HelloApplication extends Application {
         pane.getChildren().add(tail1);
 
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), this::drawSnake));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(400), this::drawSnake));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
 
@@ -126,6 +126,8 @@ public class HelloApplication extends Application {
 
 
     private void drawSnake(ActionEvent actionEvent) {
+        if (snake.size() == rows * columns)
+            endGame();
         draw();
         previousDirection = direction;
     }
@@ -135,7 +137,7 @@ public class HelloApplication extends Application {
             head.lastLocationY = head.locationY;
             head.lastLocationX = head.locationX;
             head.locationX = head.locationX + blockSize;
-            if (head.locationX > canvas.getWidth())
+            if (head.locationX > canvas.getWidth() - blockSize)
                 head.locationX = 0;
             head.setX(head.locationX);
 
@@ -143,15 +145,15 @@ public class HelloApplication extends Application {
             head.lastLocationY = head.locationY;
             head.lastLocationX = head.locationX;
             head.locationX = head.locationX - blockSize;
-            if (head.locationX < 0)
-                head.locationX = canvas.getWidth();
+            if (head.getX() == 0)
+                head.locationX = canvas.getWidth() - blockSize;
             head.setX(head.locationX);
 
         } else if (direction.equals(Dir.down)) {
             head.lastLocationX = head.locationX;
             head.lastLocationY = head.locationY;
             head.locationY = head.locationY + blockSize;
-            if (head.locationY > canvas.getHeight())
+            if (head.locationY > canvas.getHeight() - blockSize)
                 head.locationY = 0;
             head.setY(head.locationY);
 
@@ -159,8 +161,8 @@ public class HelloApplication extends Application {
             head.lastLocationX = head.locationX;
             head.lastLocationY = head.locationY;
             head.locationY = head.locationY - blockSize;
-            if (head.locationY < 0)
-                head.locationY = canvas.getHeight();
+            if (head.locationY < -1)
+                head.locationY = canvas.getHeight() - blockSize;
             head.setY(head.locationY);
         }
     }
@@ -187,6 +189,7 @@ public class HelloApplication extends Application {
                 return true;
             }
         }
+
         return false;
     }
 
