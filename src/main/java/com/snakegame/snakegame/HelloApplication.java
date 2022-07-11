@@ -7,8 +7,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -20,18 +22,23 @@ import java.util.List;
 import java.util.Random;
 
 public class HelloApplication extends Application {
+    final int WIDTH = 600;
+    final int HEIGHT = 600;
     Canvas canvas;
     SnakePart head;
     int blockSize = 50;
-    List<SnakePart> snake;
-    Dir direction = Dir.right;
-    Dir previousDirection = direction;
+    List<SnakePart> snake = new ArrayList<>();
+    Dir direction;
+    Dir previousDirection;
     Scene scene;
     Pane pane;
     Random random = new Random();
-    int rows;
-    int columns;
+    int rows = HEIGHT / blockSize;
+    int columns = WIDTH / blockSize;
     SnakePart food;
+    Timeline timeline;
+    GraphicsContext graphicsContext;
+    boolean gameRunning = false;
 
     public enum Dir {
         up, down, left, right
@@ -41,51 +48,22 @@ public class HelloApplication extends Application {
     @Override
 
     public void start(Stage stage) throws IOException {
-
-        canvas = new Canvas(600, 600);
-        Rectangle background = new Rectangle(0, 0, canvas.getHeight(), canvas.getWidth());
-        background.setFill(Paint.valueOf("BLACK"));
-
+        canvas = new Canvas(WIDTH, HEIGHT);
+        graphicsContext = canvas.getGraphicsContext2D();
         pane = new Pane();
-        columns = (int) canvas.getWidth() / blockSize;
-        rows = (int) canvas.getHeight() / blockSize;
-        snake = new ArrayList<>();
 
-        head = new SnakePart(canvas.getHeight() / 2, canvas.getWidth() / 2, blockSize, blockSize);
-        head.setFill(Paint.valueOf("RED"));
-        snake.add(head);
-        SnakePart tail = new SnakePart(snake.get(0).locationX - blockSize, snake.get(0).locationY, blockSize, blockSize);
-        tail.setFill(Paint.valueOf("#fc9403"));
-        snake.add(tail);
-        SnakePart tail1 = new SnakePart(snake.get(1).locationX - blockSize, snake.get(1).locationY, blockSize, blockSize);
-        tail1.setFill(Paint.valueOf("fc9403"));
-
-        snake.add(tail1);
-
-        food = new SnakePart(-50, -50, blockSize, blockSize);
-        moveFood();
+        graphicsContext.setFill(Color.BLACK);
+        graphicsContext.fillRect(0,0,WIDTH,HEIGHT);
 
         pane.getChildren().add(canvas);
-        pane.getChildren().add(background);
-        pane.getChildren().add(food);
-        pane.getChildren().add(head);
-        pane.getChildren().add(tail);
-        pane.getChildren().add(tail1);
+        graphicsContext.setFill(Color.WHITE);
+        graphicsContext.fillText("Press ENTER to start", 15,15);
 
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(400), this::drawSnake));
+        timeline = new Timeline(new KeyFrame(Duration.millis(200), this::drawSnake));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
-
         scene = new Scene(pane);
-        stage.setResizable(false);
-        stage.setScene(scene);
-        stage.show();
-        timeline.play();
 
-    }
-
-    private void draw() {
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent e) {
@@ -106,10 +84,28 @@ public class HelloApplication extends Application {
                         if (!(direction == Dir.left) && !(previousDirection == Dir.left))
                             direction = Dir.right;
                         break;
+                    case ENTER:
+                        if(!gameRunning) {
+                            createStartingBoard();
+                            gameRunning = true;
+                            timeline.play();
+                        }
                 }
             }
         });
+
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
+
+
+    }
+
+    private void draw() {
         isSnakeAlive();
+        if(!gameRunning) {
+            return;
+        }
         moveSnakeHead(head);
         for (int i = 1; i < snake.size(); i++)
             moveSnakeTail(snake.get(i), i);
@@ -124,11 +120,12 @@ public class HelloApplication extends Application {
         pane.getChildren().add(snakePart);
     }
 
-
     private void drawSnake(ActionEvent actionEvent) {
         if (snake.size() == rows * columns)
             endGame();
         draw();
+
+
         previousDirection = direction;
     }
 
@@ -173,6 +170,35 @@ public class HelloApplication extends Application {
             moveFood();
     }
 
+    private void createStartingBoard(){
+        for(SnakePart snakepart: snake) {
+            pane.getChildren().remove(snakepart);
+        }
+        pane.getChildren().remove(food);
+        snake.clear();
+        graphicsContext.setFill(Color.BLACK);
+        graphicsContext.fillRect(0,0,WIDTH,HEIGHT);
+
+
+        direction = Dir.right;
+
+        head = new SnakePart(canvas.getHeight() / 2, canvas.getWidth() / 2, blockSize, blockSize);
+        head.setFill(Paint.valueOf("RED"));
+        snake.add(head);
+        SnakePart tail = new SnakePart(snake.get(0).locationX - blockSize, snake.get(0).locationY, blockSize, blockSize);
+        tail.setFill(Paint.valueOf("#fc9403"));
+        snake.add(tail);
+        food = new SnakePart(-50, -50, blockSize, blockSize);
+        moveFood();
+
+
+
+        pane.getChildren().add(food);
+        pane.getChildren().add(head);
+        pane.getChildren().add(tail);
+
+    }
+
     private void spawnFoodInRandomLocation() {
         food.setFill(Paint.valueOf("Green"));
         food.locationX = random.nextInt(columns) * blockSize;
@@ -204,14 +230,17 @@ public class HelloApplication extends Application {
     private void isSnakeAlive() {
         for (int i = 1; i < snake.size(); i++) {
             if (head.getX() == snake.get(i).getX() && head.getY() == snake.get(i).getY()) {
+                snake.get(i).setFill(Paint.valueOf("WHITE"));
                 endGame();
             }
         }
     }
 
     private void endGame() {
-        System.out.println("GG");
-        System.exit(0);
+        gameRunning = false;
+        graphicsContext.setFill(Color.WHITE);
+        graphicsContext.fillText("Press ENTER to retry", 15,15);
+        timeline.stop();
     }
 
     private void moveSnakeTail(SnakePart tail, int position) {
