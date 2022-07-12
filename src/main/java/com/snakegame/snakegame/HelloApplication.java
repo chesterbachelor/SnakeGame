@@ -13,6 +13,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -115,7 +119,7 @@ public class HelloApplication extends Application {
 
     private void addSnakePart() {
         SnakePart snakePart = new SnakePart(head.lastLocationX, head.lastLocationY, blockSize, blockSize);
-        snakePart.setFill(Paint.valueOf("fc9403"));
+        snakePart.setFill(Color.BEIGE);
         snake.add(snakePart);
         pane.getChildren().add(snakePart);
     }
@@ -174,6 +178,7 @@ public class HelloApplication extends Application {
         for(SnakePart snakepart: snake) {
             pane.getChildren().remove(snakepart);
         }
+        pane.getChildren().removeIf(Text.class::isInstance);
         pane.getChildren().remove(food);
         snake.clear();
         graphicsContext.setFill(Color.BLACK);
@@ -183,15 +188,13 @@ public class HelloApplication extends Application {
         direction = Dir.right;
 
         head = new SnakePart(canvas.getHeight() / 2, canvas.getWidth() / 2, blockSize, blockSize);
-        head.setFill(Paint.valueOf("RED"));
+        head.setFill(Color.BEIGE);
         snake.add(head);
         SnakePart tail = new SnakePart(snake.get(0).locationX - blockSize, snake.get(0).locationY, blockSize, blockSize);
-        tail.setFill(Paint.valueOf("#fc9403"));
+        tail.setFill(Color.BEIGE);
         snake.add(tail);
         food = new SnakePart(-50, -50, blockSize, blockSize);
         moveFood();
-
-
 
         pane.getChildren().add(food);
         pane.getChildren().add(head);
@@ -230,7 +233,7 @@ public class HelloApplication extends Application {
     private void isSnakeAlive() {
         for (int i = 1; i < snake.size(); i++) {
             if (head.getX() == snake.get(i).getX() && head.getY() == snake.get(i).getY()) {
-                snake.get(i).setFill(Paint.valueOf("WHITE"));
+                snake.get(i).setFill(Color.RED);
                 endGame();
             }
         }
@@ -238,8 +241,12 @@ public class HelloApplication extends Application {
 
     private void endGame() {
         gameRunning = false;
-        graphicsContext.setFill(Color.WHITE);
-        graphicsContext.fillText("Press ENTER to retry", 15,15);
+        Text gameOver = new Text(25,25,"Game Over\n Press ENTER to retry");
+        gameOver.setFill(Paint.valueOf("#67007a"));
+        gameOver.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+
+        pane.getChildren().add(gameOver);
+
         timeline.stop();
     }
 
