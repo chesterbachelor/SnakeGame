@@ -19,10 +19,12 @@ public class Painter implements IPainter {
 
     @Override
     public void paintSnake(List<SnakePart> snake) {
-        for (SnakePart snakePart : snake) {
-            graphicsContext.setFill(Color.BEIGE);
-            graphicsContext.fillRect(snakePart.currentLocation.x * blockSize, snakePart.currentLocation.y * blockSize, blockSize, blockSize);
-        }
+        graphicsContext.setFill(Color.BEIGE);
+        snake.forEach(snakePart -> graphicsContext.fillRect(
+                snakePart.currentLocation.x * blockSize,
+                snakePart.currentLocation.y * blockSize,
+                blockSize,
+                blockSize));
     }
 
     @Override
@@ -52,13 +54,14 @@ public class Painter implements IPainter {
 
     @Override
     public void paintDeadSnake(List<SnakePart> snake) {
-        for (int i = 1; i < snake.size(); i++) {
-            graphicsContext.setFill(Color.BEIGE);
-            graphicsContext.fillRect(snake.get(i).currentLocation.x * blockSize,
-                    snake.get(i).currentLocation.y * blockSize,
-                    blockSize,
-                    blockSize);
-        }
+        graphicsContext.setFill(Color.BEIGE);
+        snake.stream()
+                .skip(1)
+                .forEach(snakePart -> graphicsContext.fillRect(
+                        snakePart.currentLocation.x * blockSize,
+                        snakePart.currentLocation.y * blockSize,
+                            blockSize,
+                            blockSize));
 
         graphicsContext.setFill(Color.RED);
         graphicsContext.fillRect(snake.get(0).currentLocation.x * blockSize,

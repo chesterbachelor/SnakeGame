@@ -81,32 +81,46 @@ public class HelloApplication extends Application {
     private void draw(ActionEvent actionEvent) {
         painter.clearScreen();
         if (engine.isGameOver() == GameStatus.GAME_OVER) {
-            painter.paintDeadSnake(engine.getSnake());
-            painter.paintScore(engine.getScore());
-            painter.paintText("Game Over \n Press Enter to RESTART");
-            gameRunning = false;
-            timeline.stop();
+            endTheGameUnsuccessfully();
             return;
         }
         if (engine.isGameOver() == GameStatus.GAME_WON) {
-            painter.paintSnake(engine.getSnake());
-            painter.paintScore(engine.getScore());
-            painter.paintText("CONGRATULATIONS YOU WON!!");
-            gameRunning = false;
-            timeline.stop();
+            endTheGameSuccessfully();
             return;
         }
-        engine.moveSnake();
-        painter.paintSnake(engine.getSnake());
-        painter.paintFood(engine.getFood());
-        painter.paintScore(engine.getScore());
-
+        nextMove();
     }
 
     private void createStartingBoard() {
         canvas = new Canvas(boardSize, boardSize);
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         painter = new Painter(boardSize, DIMENSION, graphicsContext);
+    }
+
+    private void endTheGameUnsuccessfully() {
+        painter.paintDeadSnake(engine.getSnake());
+        painter.paintScore(engine.getScore());
+        painter.paintText("Game Over \n Press Enter to RESTART");
+        stopTheGame();
+    }
+
+    private void endTheGameSuccessfully() {
+        painter.paintSnake(engine.getSnake());
+        painter.paintScore(engine.getScore());
+        painter.paintText("CONGRATULATIONS YOU WON!!");
+        stopTheGame();
+    }
+
+    private void stopTheGame(){
+        gameRunning = false;
+        timeline.stop();
+    }
+
+    private void nextMove() {
+        engine.moveSnake();
+        painter.paintSnake(engine.getSnake());
+        painter.paintFood(engine.getFood());
+        painter.paintScore(engine.getScore());
     }
 
     public static void main(String[] args) {

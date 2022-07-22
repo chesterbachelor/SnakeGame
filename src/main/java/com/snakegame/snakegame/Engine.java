@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Random;
 
 public class Engine implements IEngine {
-    final int DIMENSION;
+    private final int DIMENSION;
     private Direction currentDirection;
     private Direction previousDirection;
-    private List<SnakePart> snake = new ArrayList<>();
-    private SnakePart food;
-    private SnakePart head;
-    private Random random = new Random();
+    private final List<SnakePart> snake = new ArrayList<>();
+    private final SnakePart food;
+    private final SnakePart head;
+    private final Random random = new Random();
 
     Engine(int dimension) {
         this.DIMENSION = dimension;
@@ -43,7 +43,7 @@ public class Engine implements IEngine {
 
     private void moveFood() {
         spawnFoodInRandomLocation();
-        while (verifyIfFoodInsideSnake())
+        while (foodSpawnedInsideSnake())
             moveFood();
     }
 
@@ -55,13 +55,10 @@ public class Engine implements IEngine {
         return new Point(random.nextInt(DIMENSION), random.nextInt(DIMENSION));
     }
 
-    private boolean verifyIfFoodInsideSnake() {
-        for (SnakePart snakePart : snake) {
-            if (snakePart.currentLocation.equals(food.currentLocation)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean foodSpawnedInsideSnake() {
+
+        return snake.stream()
+                .anyMatch(currentPart -> currentPart.currentLocation.equals(food.currentLocation));
     }
 
     @Override
@@ -137,11 +134,15 @@ public class Engine implements IEngine {
         if (snake.size() == DIMENSION * DIMENSION) {
             return GameStatus.GAME_WON;
         }
-        for (int i = 1; i < snake.size(); i++) {
-            if (head.currentLocation.equals(snake.get(i).currentLocation)) {
-                return GameStatus.GAME_OVER;
-            }
-        }
+
+        boolean snakeHeadCollidesWithBody = snake.stream()
+                .skip(1)
+                .anyMatch(currentPart -> currentPart.currentLocation.equals(head.currentLocation));
+
+        if (snakeHeadCollidesWithBody)
+            return GameStatus.GAME_OVER;
+
+
         return GameStatus.GAME_RUNNING;
     }
 
