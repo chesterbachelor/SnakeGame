@@ -1,27 +1,29 @@
 package com.snakegame.snakegame;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Engine implements IEngine {
     private final int DIMENSION;
     private Direction currentDirection;
     private Direction previousDirection;
-    private final List<SnakePart> snake = new ArrayList<>();
+    private final List<SnakePart> snake;
     private final SnakePart food;
     private final SnakePart head;
-    private final Random random = new Random();
 
-    Engine(int dimension) {
+    private final IRandomLocationGenerator locationGenerator;
+
+    Engine(IRandomLocationGenerator locationGenerator , int dimension, Direction startingDirection, Point ... startingPoints ) {
         this.DIMENSION = dimension;
-        head = new SnakePart(new Point(DIMENSION / 2, DIMENSION / 2),
-                new Point(DIMENSION / 2, DIMENSION / 2));
-        SnakePart tail = new SnakePart(new Point(DIMENSION / 2 - 1, DIMENSION / 2),
-                new Point(DIMENSION / 2 - 1, DIMENSION / 2));
-        snake.add(head);
-        snake.add(tail);
-        currentDirection = Direction.right;
+        this.locationGenerator = locationGenerator;
+
+        this.snake = Arrays.stream(startingPoints)
+                .map(partPosition -> new SnakePart(partPosition, partPosition))
+                .collect(Collectors.toList());
+        head = snake.get(0);
+
+        currentDirection = startingDirection;
         previousDirection = currentDirection;
         Point point = new Point(0, 0);
         food = new SnakePart(point, point);
@@ -48,11 +50,7 @@ public class Engine implements IEngine {
     }
 
     private void spawnFoodInRandomLocation() {
-        food.currentLocation = createNewLocation();
-    }
-
-    private Point createNewLocation() {
-        return new Point(random.nextInt(DIMENSION), random.nextInt(DIMENSION));
+        food.currentLocation = locationGenerator.generatePoint(DIMENSION, DIMENSION);
     }
 
     private boolean foodSpawnedInsideSnake() {

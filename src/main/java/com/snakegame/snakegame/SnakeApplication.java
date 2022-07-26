@@ -14,7 +14,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class HelloApplication extends Application {
+public class SnakeApplication extends Application {
     private final int DIMENSION = 24;
     private final int boardSize = 600;
     private final int INTERVAL_MS = 600;
@@ -23,6 +23,7 @@ public class HelloApplication extends Application {
     private boolean gameRunning = false;
     private IPainter painter;
     private IEngine engine;
+
 
     @Override
     public void start(Stage stage) {
@@ -50,7 +51,11 @@ public class HelloApplication extends Application {
                         break;
                     case ENTER:
                         if (!gameRunning) {
-                            engine = new Engine(DIMENSION);
+                            engine = new Engine(new RandomLocationGenerator(),
+                                            DIMENSION,
+                                            Direction.right,
+                                            new Point (DIMENSION / 2, DIMENSION / 2),
+                                            new Point (DIMENSION / 2 - 1, DIMENSION / 2));
                             gameRunning = true;
                             timeline.play();
                         }
