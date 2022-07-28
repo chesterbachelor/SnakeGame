@@ -1,27 +1,29 @@
 package com.snakegame.snakegame;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Engine implements IEngine {
     private final int DIMENSION;
     private Direction currentDirection;
     private Direction previousDirection;
-    private final List<SnakePart> snake;
+    private final List<SnakePart> snake = new ArrayList<>();
     private final SnakePart food;
     private final SnakePart head;
 
     private final IRandomLocationGenerator locationGenerator;
 
-    Engine(IRandomLocationGenerator locationGenerator , int dimension, Direction startingDirection, Point ... startingPoints ) {
+    Engine(IRandomLocationGenerator locationGenerator, int dimension, Direction startingDirection, Point headLocation, Point... tailsLocations) {
         this.DIMENSION = dimension;
         this.locationGenerator = locationGenerator;
+        head = new SnakePart(headLocation, headLocation);
+        snake.add(head);
 
-        this.snake = Arrays.stream(startingPoints)
+        List<SnakePart> tails = Arrays.stream(tailsLocations)
                 .map(partPosition -> new SnakePart(partPosition, partPosition))
-                .collect(Collectors.toList());
-        head = snake.get(0);
+                .toList();
+        snake.addAll(tails);
 
         currentDirection = startingDirection;
         previousDirection = currentDirection;
@@ -60,30 +62,35 @@ public class Engine implements IEngine {
     }
 
     @Override
-    public void changeDirection(Direction direction) {
+    public boolean changeDirection(Direction direction) {
         switch (direction) {
             case down:
                 if (!(currentDirection == Direction.up) && !(previousDirection == Direction.up)) {
                     currentDirection = direction;
+                    return true;
                 }
                 break;
             case up:
                 if (!(currentDirection == Direction.down) && !(previousDirection == Direction.down)) {
                     currentDirection = direction;
+                    return true;
                 }
                 break;
             case left:
                 if (!(currentDirection == Direction.right) && !(previousDirection == Direction.right)) {
                     currentDirection = direction;
+                    return true;
                 }
                 break;
             case right:
                 if (!(currentDirection == Direction.left) && !(previousDirection == Direction.left)) {
                     currentDirection = direction;
+                    return true;
                 }
                 break;
 
         }
+        return false;
     }
 
     @Override

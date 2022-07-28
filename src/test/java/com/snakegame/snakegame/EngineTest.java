@@ -2,6 +2,8 @@ package com.snakegame.snakegame;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,31 +16,22 @@ public class EngineTest {
 
     @Test
     void isGameOver_whenSnakeSizeEqualsGridSize_returnsGameWon() {
-        //given
-
         Point dummyPoint = new Point(1, 1);
         engine = new Engine(locationGeneratorMock, 2, Direction.right, dummyPoint, dummyPoint, dummyPoint, dummyPoint);
 
-        //when
         GameStatus gameStatus = engine.isGameOver();
 
-        //then
         assertSame(GameStatus.GAME_WON, gameStatus);
-
     }
 
     @Test
     void isGameOver_whenSnakeHeadCollidesWithTail_returnsGameOver() {
-        //given
         Point snakePiece = new Point(1, 1);
         engine = new Engine(locationGeneratorMock, 2, Direction.right, snakePiece, snakePiece);
 
-        //when
         GameStatus gameStatus = engine.isGameOver();
 
-        //then
         assertSame(GameStatus.GAME_OVER, gameStatus);
-
     }
 
     @Test
@@ -232,12 +225,9 @@ public class EngineTest {
         Point head = new Point(1, 2);
         engine = new Engine(locationGeneratorMock, 3, Direction.right, head);
 
-        engine.changeDirection(Direction.up);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.up);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1, snakeHead.currentLocation.x);
-        assertEquals(2 - 1, snakeHead.currentLocation.y);
+        assertTrue(directionChanged);
     }
 
     @Test
@@ -245,12 +235,9 @@ public class EngineTest {
         Point head = new Point(1, 0);
         engine = new Engine(locationGeneratorMock, 3, Direction.right, head);
 
-        engine.changeDirection(Direction.down);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.down);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1, snakeHead.currentLocation.x);
-        assertEquals(0 + 1, snakeHead.currentLocation.y);
+        assertTrue(directionChanged);
     }
 
     @Test
@@ -258,12 +245,9 @@ public class EngineTest {
         Point head = new Point(1, 0);
         engine = new Engine(locationGeneratorMock, 3, Direction.up, head);
 
-        engine.changeDirection(Direction.right);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.right);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1 + 1, snakeHead.currentLocation.x);
-        assertEquals(0, snakeHead.currentLocation.y);
+        assertTrue(directionChanged);
     }
 
     @Test
@@ -271,12 +255,9 @@ public class EngineTest {
         Point head = new Point(1, 0);
         engine = new Engine(locationGeneratorMock, 3, Direction.up, head);
 
-        engine.changeDirection(Direction.left);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.left);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1 - 1, snakeHead.currentLocation.x);
-        assertEquals(0, snakeHead.currentLocation.y);
+        assertTrue(directionChanged);
     }
 
     @Test
@@ -284,12 +265,9 @@ public class EngineTest {
         Point head = new Point(1, 0);
         engine = new Engine(locationGeneratorMock, 3, Direction.right, head);
 
-        engine.changeDirection(Direction.left);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.left);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1 + 1, snakeHead.currentLocation.x);
-        assertEquals(0, snakeHead.currentLocation.y);
+        assertFalse(directionChanged);
     }
 
     @Test
@@ -297,12 +275,9 @@ public class EngineTest {
         Point head = new Point(1, 0);
         engine = new Engine(locationGeneratorMock, 3, Direction.left, head);
 
-        engine.changeDirection(Direction.right);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.right);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1 - 1, snakeHead.currentLocation.x);
-        assertEquals(0, snakeHead.currentLocation.y);
+        assertFalse(directionChanged);
     }
 
     @Test
@@ -310,12 +285,9 @@ public class EngineTest {
         Point head = new Point(1, 1);
         engine = new Engine(locationGeneratorMock, 3, Direction.down, head);
 
-        engine.changeDirection(Direction.up);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.up);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1, snakeHead.currentLocation.x);
-        assertEquals(1 + 1, snakeHead.currentLocation.y);
+        assertFalse(directionChanged);
     }
 
     @Test
@@ -323,12 +295,9 @@ public class EngineTest {
         Point head = new Point(1, 1);
         engine = new Engine(locationGeneratorMock, 3, Direction.up, head);
 
-        engine.changeDirection(Direction.down);
-        engine.moveSnake();
+        boolean directionChanged = engine.changeDirection(Direction.down);
 
-        SnakePart snakeHead = engine.getSnake().get(0);
-        assertEquals(1, snakeHead.currentLocation.x);
-        assertEquals(1 - 1, snakeHead.currentLocation.y);
+        assertFalse(directionChanged);
     }
 
 }

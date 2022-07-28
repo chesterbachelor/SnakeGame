@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IEngine {
 
-    void changeDirection(Direction direction);
+    boolean changeDirection(Direction direction);
 
     void moveSnake();
 
